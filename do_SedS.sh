@@ -1,9 +1,25 @@
 #run all the scripts associated with SedS.
 
+##To run this script, you should have:
+#reference files:
+##ChangeToZeroKeys.txt
+##FlaTimepointsStdRefs_SedS.csv
+##HydrolysisCutsInfo.csv
+#scripts:
+##RawGpcProcess_SedS.R
+##GetMaxFluorescence_SedS.R
+##CalculateStdBins_SedS.R
+##FlaRates_SedS.R
+##PreXFlaRates_SedS.R
+##FlaProcess_SedS.R
+##PreXFlaProcess_SedS.R
+##FiguresAndAnalysis_SedS.R
+#data download
+
 ##Download raw GPC data:
-	
-##Slant correct data from raw GPC output for rates and standards; On the command line run:
-	
+
+##Slant correct data from raw GPC output for rates and standards
+
 RScript RawGPCProcess_SedS.R "CoreComparison-raw-data-asc" "CoreComparison-csvs-for-rates" "CoreComparison-chroms-raw-data-png"
 RScript RawGPCProcess_SedS.R "MarmaraMethodsDevel-raw-data-asc" "MarmaraMethodsDevel-csvs-for-rates" "MarmaraMethodsDevel-chroms-raw-data-png"
 RScript RawGPCProcess_SedS.R "stds-gpc1-110515/raw-asc" "stds-gpc1-110515/slant-corrected-csv" "stds-gpc1-110515/chroms-png"
@@ -33,7 +49,7 @@ RScript FlaRates_SedS.R "CoreComparison-csvs-for-rates" "FlaRates_SedS.csv"
 #For PreX Marmara data
 RScript PreXFlaRates_SedS.R "MarmaraMethodsDevel-csvs-for-rates" "PreXFlaRates_SedS.csv"
 
-##Process rates: 
+##Process rates:
 #for CoreComparison Guaymas and Med data
 RScript FlaProcess_SedS.R "FlaRates_SedS.csv" "FlaRatesFinal_SedS.csv" "FlaMaxRatesFinal_SedS.csv"
 #for PreX Marmara data
@@ -41,6 +57,6 @@ RScript PreXFlaProcess_SedS.R "PreXFlaRates_SedS.csv" "PreXFlaRatesFinal_SedS.cs
 
 ##Complete statistical analyses and generate figures in publication:
 RScript FiguresAndAnalysis_SedS.R
-	
+
 
 ##Process treatment development preliminary experiments

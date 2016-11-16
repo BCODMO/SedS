@@ -1,6 +1,6 @@
 #figures and analysis for SedS
 
-packages <- c("ggplot2","RColorBrewer","grDevices","reshape2","grid","gridExtra")
+packages <- c("ggplot2","RColorBrewer","grDevices","reshape2","grid","gridExtra","png")
 to_install <- packages[!packages %in% installed.packages()]
 if (length(to_install)>0) {
     lapply(to_install,install.packages, repos="http://cran.rstudio.com/") 
@@ -12,6 +12,8 @@ if (file.exists("figures")) {
 } else {
     dir.create("figures")
 }
+#name of folder your slant corrected csvs are in
+csvDir <- "CoreComparison-csvs-for-rates/"
 
 #read in files needed to generate figures
 maxes <- read.csv("FlaMaxRatesFinal_SedS.csv",header=TRUE,row.names=1)
@@ -36,7 +38,7 @@ hmw_intensities$core.depth <- factor(hmw_intensities$core.depth,levels=c("P1.5cm
 maxes$core.depth <- factor(maxes$core.depth,levels=c("P1.5cm","P1.55cm","P3.5cm","P3.55cm","P5.5cm","P5.55cm","P8.5cm","P8.55cm","P10.5cm","P10.55cm","P13.5cm","P13.55cm","N.365cm","S4.385cm","N.440cm","S5.470cm","N.575cm","S7.590cm"))
 maxes$seddepth.cm <- factor(maxes$seddepth.cm,levels=c("5cm","55cm","365cm","385cm","440cm","470cm","575cm","590cm"))
 
-#define color palette
+#define color palettes
 colors <- brewer.pal("Set2",n=8)
 SubstrateColors <- colors[1:2] 
 TreatColors <- colors[3:4]
@@ -44,51 +46,74 @@ LocationColors <- colors[5:6]
 MWColors <- colors[7:8]
 #define PreX color palette
 #prex1TrtColors are based off of brewer.pal("RdYlGn",n=3), but first color is replaced to be consisted with prex2TrtColors
-prex1TrtColors <- c(colors[3],"#FEE8C8","#FFFFBF","#91CF60")
-prex2TrtColors <- c(colors[3],brewer.pal("OrRd",n=3))
-prex3TrtColors <- c(colors[3],"#E34A33",colors[4])
+prex1TrtColors <- c("#FEE8C8","#FFFFBF","#91CF60")
+prex2TrtColors <- c(brewer.pal("OrRd",n=3))
+prex3TrtColors <- c("#E34A33",colors[4])
 
 ############# Figure 2  ###############
 #example of treatment improvement on chromatogram quality; S4-chon, P13-55cm-lam, P1-55cm-lam
-#chon_example <- row.names(maxes)[grep("S4-385cm-trt-chon",row.names(maxes))]
-#lam_example <- row.names(maxes)[grep("P13-55cm-trt-lam",row.names(maxes))]
-#define chon chromatograms to compile
-#cnotrt_x <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-x-t\\6.png",chon_example),sep="")
-#cnotrt_1 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-1-t\\6.png",chon_example),sep="")
-#cnotrt_2 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-2-t\\6.png",chon_example),sep="")
-#cnotrt_3 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-3-t\\6.png",chon_example),sep="")
-#ctrt_x <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-x-t\\6.png",chon_example),sep="")
-#ctrt_1 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-1-t\\6.png",chon_example),sep="")
-#ctrt_2 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-2-t\\6.png",chon_example),sep="")
-#ctrt_3 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-3-t\\6.png",chon_example),sep="")
-#chon_paths <- c(cnotrt_x,ctrt_x,cnotrt_1,ctrt_1,cnotrt_2,ctrt_2,cnotrt_3,ctrt_3)
-##read in all the chon pngs
-#crl = lapply(chon_paths, readPNG)
-#cgl = lapply(crl, rasterGrob)
-#cgl2 <- append(cgl,list(ncol=2),0)
-#define lam chromatograms to compile
-#lnotrt_x <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-x-t\\6.png",lam_example),sep="")
-#lnotrt_1 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-1-t\\6.png",lam_example),sep="")
-#lnotrt_2 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-2-t\\6.png",lam_example),sep="")
-#lnotrt_3 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-notrt-\\5-3-t\\6.png",lam_example),sep="")
-#ltrt_x <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-x-t\\6.png",lam_example),sep="")
-#ltrt_1 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-1-t\\6.png",lam_example),sep="")
-#ltrt_2 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-2-t\\6.png",lam_example),sep="")
-#ltrt_3 <- paste("CoreComparison-chroms-raw-data-png/",gsub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-t([0-9])",replacement="\\1-\\2-\\3cm-trt-\\5-3-t\\6.png",lam_example),sep="")
-#lam_paths <- c(lnotrt_x,ltrt_x,lnotrt_1,ltrt_1,lnotrt_2,ltrt_2,lnotrt_3,ltrt_3)
-##read in all the lam pngs
-#lrl = lapply(lam_paths, readPNG)
-#lgl = lapply(lrl, rasterGrob)
-#lgl2 <- append(lgl,list(ncol=2),0)
-
-#fig 9a, chon example
-#png("figures/Fig9a_ChonChromsTreatmentComparison.png",width=85,height=140,res=900,units="mm")
-#do.call(grid.arrange,cgl2)
-#dev.off()
-#fig 9b, lam example
-#png("figures/Fig9b_LamChromsTreatmentComparison.png",width=85,height=140,res=900,units="mm")
-#do.call(grid.arrange,lgl2)
-#dev.off()
+S4_example <- intersect(list.files(path=csvDir,pattern=("S4-385cm")),list.files(path=csvDir,pattern=("chon")))
+P13_example <- intersect(list.files(path=csvDir,pattern=("P13-55cm")),list.files(path=csvDir,pattern=("lam")))
+P1_example <- intersect(list.files(path=csvDir,pattern=("P1-55cm")),list.files(path=csvDir,pattern=("lam")))
+examples <- list("a-Med-S4-385cm-chon"=S4_example,"b-Guaymas-P13-55cm-lam"=P13_example,"c-Guaymas-P1-55cm-lam"=P1_example)
+#load in the slant corrected csvs for that example, compile into 32 dataframes with time, fluorescence, sample, and trt columns
+#rbind all 32 dataframes into 1
+theme_chroms <- theme(panel.grid.major=element_line(color="gray85"),strip.text=element_text(size=6),strip.background=element_rect(fill="grey93"),axis.text=element_text(size=4),axis.title=element_text(size=6),plot.title=element_text(face="bold",size=7))
+fig2 <- list()
+blankPlot <- ggplot()+geom_blank(aes(1,1))+
+    theme(
+        plot.background = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank()
+    )
+for (example in 1:length(examples)) {
+    subfig <- c("a","b","c")
+    part <- paste("(",subfig[example],")",sep="")
+    label <- ggplot() + annotate(geom="text",x=1,y=1,label=part,size=10) + theme(plot.background = element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(), panel.border = element_blank(),panel.background = element_blank(),axis.title.x = element_blank(),axis.title.y = element_blank(),axis.text.x = element_blank(), axis.text.y = element_blank(),axis.ticks = element_blank(),axis.line = element_blank())
+    df <- data.frame()
+    for (file in examples[[example]]) {
+        one_sample <- read.csv(paste(csvDir,file,sep=""),header=TRUE)
+        one_sample$sample <- rep(sub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-([a-z0-9])-t([0-9]).csv",replacement="\\6-t\\7",file),nrow(one_sample))
+        one_sample$treatment <- rep(sub(pattern="([Guaymas|Med]+)-([A-Z0-9]+)-([0-9]+)cm-(trt|notrt)-([a-z]+)-([a-z0-9])-t([0-9]).csv",replacement="\\4",file),nrow(one_sample))
+        df <- rbind(df,one_sample)
+    }
+    plot_title <- substr(names(examples[example]),3,nchar(names(examples[example])))
+    plot_title <- gsub("-","_",plot_title)
+    figno <- substr(names(examples[example]),1,1)
+    figs <- list()
+    header <- list(label,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot)
+    for (treatment in levels(factor(df$treatment))) {
+        treat <- df[df$treatment==treatment,]
+        for (sample in levels(factor(treat$sample))) {
+            fig_data <- treat[treat$sample==sample,]
+            plot_name <- paste(treatment,sample,sep="-")
+            entry_name <- paste(plot_title,plot_name,sep="-")
+            #make plot
+            plot <- ggplot(fig_data,aes(x=time,y=SlantCorrectedReads)) + geom_point(color="blue4",pch=20,size=0.05) + theme_bw() + labs(x="",y="",title=sample) + theme(plot.margin=unit(c(0,0,1,0),"mm"),panel.grid=element_blank(),axis.text=element_text(size=7),axis.title=element_blank(),plot.title=element_text(face="bold",size=7))
+            #store plot in list
+            figs[[plot_name]] <- plot
+            fig2[[entry_name]] <- plot
+            header[[plot_name]] <- plot
+        }
+    }
+    png(paste("figures/Fig2",figno,"_",plot_title,"ChromsComparison.png",sep=""),width=540,height=120,res=900,units="mm")
+    #do.call(grid.arrange,c(header,ncol=16,nrow=3, left="mV",sub="time (min)"))
+    do.call(grid.arrange,c(header,ncol=16,nrow=3, left="mV",sub="time (min)"))
+    dev.off()
+}
+rl = lapply(list("figures/Fig2a_Med_S4_385cm_chonChromsComparison.png","figures/Fig2b_Guaymas_P13_55cm_lamChromsComparison.png","figures/Fig2c_Guaymas_P1_55cm_lamChromsComparison.png"), readPNG)
+gl = lapply(rl, rasterGrob)
+png("figures/Fig2_chromcomparison.png",res=900,units="mm") #width=540,height=360,
+grid.arrange(gl) #grobs=
+dev.off()
 
 ###################### Figure 3 ########################
 ##difference in maximum fluorescence intensity notrt/trt, and percent improvement 
@@ -118,7 +143,8 @@ intensities_melt <- melt(intensities_complete,id.vars=c("Inc","location","core.d
 ##Fig 3a
 percentFl <- intensities_melt[intensities_melt$variable=="PercentImprovement",]
 png("figures/Fig3a_PercentImprovementFluorescence.png",width=85,height=90,units="mm",res=900)
-ggplot(percentFl,aes(x=variable,y=value)) + geom_boxplot(width=0.5) + theme_bw() + theme(axis.text.x=element_blank(),axis.title.y=element_text(vjust=1)) + labs(x="",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,650)) + scale_y_continuous(breaks=c(0,50,100,200,400,600))
+p3a <- ggplot(percentFl,aes(x=variable,y=value)) + geom_boxplot(width=0.5) + theme_bw() + theme(axis.text.x=element_blank(),axis.title.y=element_text(vjust=1)) + labs(x="",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,650)) + scale_y_continuous(breaks=c(0,50,100,200,400,600))
+print(p3a)
 dev.off()
 
 #max fluorescence intensity between notrt/trt for hmw and lmw portions (first third and last third of chromatogram)
@@ -144,7 +170,8 @@ print("-----------------------------")
 
 ### Fig 3b
 png("figures/Fig3b_PercentImprovementHMWvsLMW.png",width=85,height=75,units="mm",res=900)
-ggplot(percentMW,aes(x=MW,y=value)) + geom_boxplot(width=0.5,aes(fill=MW)) + scale_fill_manual(values=MWColors) + theme_bw() + theme(axis.title.y=element_text(vjust=1,size=10),axis.title.x=element_text(vjust=-0.4,size=10),axis.text=element_text(size=7),legend.position="none") + labs(x="Molecular Weight",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,1000)) 
+p3b <- ggplot(percentMW,aes(x=MW,y=value)) + geom_boxplot(width=0.5,aes(fill=MW)) + scale_fill_manual(values=MWColors) + theme_bw() + theme(axis.title.y=element_text(vjust=1,size=10),axis.title.x=element_text(vjust=-0.4,size=10),axis.text=element_text(size=7),legend.position="none") + labs(x="Molecular Weight",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,1000)) 
+print(p3b)
 dev.off()
 
 #difference in maximum hydrolysis rate between notrt/trt
@@ -169,34 +196,17 @@ print("----------------------------")
 
 ##Fig 3c
 png("figures/Fig3c_DecreaseMaxHydrolRateNotrtTrt.png",width=85,height=80,units="mm",res=900)
-ggplot(maxes_boxplot_melt,aes(x=variable,y=value)) + geom_boxplot(fill=TreatColors) + geom_line(color="grey25",alpha=0.2,size=0.25,aes(group=Inc)) + theme_bw() + labs(x="",y="Max Hydrolysis Rate (nM/hr)") + scale_x_discrete(labels=c("no treatment","competitive desorption + SDS")) +  theme(axis.title.y=element_text(vjust=1,size=10),axis.title.x=element_text(vjust=-0.4,size=10),axis.text=element_text(size=7)) + coord_cartesian(ylim=c(0,250))
+p3c <- ggplot(maxes_boxplot_melt,aes(x=variable,y=value)) + geom_boxplot(fill=TreatColors) + geom_line(color="grey25",alpha=0.2,size=0.25,aes(group=Inc)) + theme_bw() + labs(x="",y="Max Hydrolysis Rate (nM/hr)") + scale_x_discrete(labels=c("no treatment","competitive desorption + SDS")) +  theme(axis.title.y=element_text(vjust=1,size=10),axis.title.x=element_text(vjust=-0.4,size=10),axis.text=element_text(size=7)) + coord_cartesian(ylim=c(0,250))
+print(p3c)
 dev.off()
 
 
 ###################### Figure 4 ########################
-#uses maxes
-#errorbar
-errorbars <- geom_errorbar(aes(ymin=mean.kcrate.nM.hr-sd.kcrate.nM.hr,ymax=mean.kcrate.nM.hr+sd.kcrate.nM.hr),width=0.4,color="grey25",alpha=0.7,size=0.3)
-theme_barplot <- theme_bw() + theme(axis.text.y=element_blank(),strip.background=element_rect(fill="grey93"))
-guaymas.trt <- maxes[maxes$location=="Guaymas" & maxes$treatment=="trt",]
-med.trt <- maxes[maxes$location=="Med" & maxes$treatment=="trt",]
-
-## Fig 4a - horizontal barplot Guaymas 
-png("figures/Fig4a_GuaymasMaxRatesBarplot.png",width=180,height=50,units="mm",res=900)
-ggplot(guaymas.trt,aes(x=substrate,y=mean.kcrate.nM.hr)) + geom_bar(stat="identity",aes(fill=substrate)) + facet_grid(seddepth.cm~core) + errorbars + theme_barplot + scale_fill_manual(values=SubstrateColors) + coord_flip() + scale_y_continuous(breaks=c(0,100,200)) + labs(y="hydrolysis rate nM/hr",x="")
-dev.off()
-
-## Fig 4b - barplot Med
-png("figures/Fig4b_MedMaxRatesBarplot.png",width=85,height=150,units="mm",res=900)
-ggplot(med.trt,aes(x=substrate,y=mean.kcrate.nM.hr)) + geom_bar(stat="identity",aes(fill=substrate)) + facet_grid(core.depth~.) + errorbars + theme_barplot + scale_fill_manual(values=SubstrateColors) + coord_flip() + scale_y_continuous(breaks=c(0,10,20,30)) + coord_flip(ylim=c(0,40)) + labs(y="hydrolysis rate nM/hr",x="")
-dev.off()
-
-
-###################### Figure 5 ########################
-#uses percentFl defined in fig 3a
-theme_fig5a <- theme_bw() + theme(strip.background=element_rect(fill="grey93"),axis.text.y=element_text(size=6),axis.text.x=element_blank(),axis.title=element_text(size=7),strip.text=element_text(size=5,face="bold"),legend.position="none")
-png("figures/Fig5a_PercentImprovementByLocation.png",width=180,height=48,units="mm",res=900)
-ggplot(percentFl,aes(x=variable,y=value)) + geom_boxplot(width=0.5,size=0.3,outlier.size=1,aes(fill=location)) + theme_fig5a + labs(x="Site (Core.Depth)",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,750)) + scale_y_continuous(breaks=c(0,100,300,500,700)) + facet_grid(.~core.depth) + scale_fill_manual(values=LocationColors)
+#uses percentFl defined in fig 4a
+theme_fig4a <- theme_bw() + theme(strip.background=element_rect(fill="grey93"),axis.text.y=element_text(size=6),axis.text.x=element_blank(),axis.title=element_text(size=7),strip.text=element_text(size=5,face="bold"),legend.position="none")
+png("figures/Fig4a_PercentImprovementByLocation.png",width=180,height=48,units="mm",res=900)
+p4a <- ggplot(percentFl,aes(x=variable,y=value)) + geom_boxplot(width=0.5,size=0.3,outlier.size=1,aes(fill=location)) + theme_fig4a + labs(x="Site (Core.Depth)",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,750)) + scale_y_continuous(breaks=c(0,100,300,500,700)) + facet_grid(.~core.depth) + scale_fill_manual(values=LocationColors)
+print(p4a)
 dev.off()
 
 site_tests <- data.frame()
@@ -215,9 +225,10 @@ print("(P-values not corrected for multiple testing, outliers not removed)")
 print(site_tests)
 print("----------------------------")
 
-theme_fig5b <- theme_bw() + theme(axis.title=element_text(size=9,vjust=1),axis.text=element_text(size=7),legend.position="none")
-png("figures/Fig5b_PercentImprovementBySubstrate.png",width=85,height=75,units="mm",res=900)
-ggplot(percentFl,aes(x=substrate,y=value)) + geom_boxplot(aes(fill=substrate)) + theme_fig5b + labs(x="",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(-10,500)) + scale_fill_manual(values=SubstrateColors)
+theme_fig4b <- theme_bw() + theme(axis.title=element_text(size=9,vjust=1),axis.text=element_text(size=7),legend.position="none")
+png("figures/Fig4b_PercentImprovementBySubstrate.png",width=85,height=75,units="mm",res=900)
+p4b <- ggplot(percentFl,aes(x=substrate,y=value)) + geom_boxplot(aes(fill=substrate)) + theme_fig4b + labs(x="",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(-10,500)) + scale_fill_manual(values=SubstrateColors)
+print(p4b)
 dev.off()
 
 lam <- percentFl[percentFl$substrate=="lam",]
@@ -231,39 +242,47 @@ print(paste(round(median(chon$value),2),"; (P=",round(chon_test$p.value,3),")"))
 print("-------------------------------")
 
 
-
-###################### Figure 6 ########################
+###################### Figure 5 ########################
 #define prex1, prex2, prex3
 prex1 <- prex_intensities[grep("PreX1",prex_intensities$Inc),]
 prex1 <- prex1[,colSums(is.na(prex1))==0]
 prex1_melt <- melt(prex1,id.vars=c("Inc","location","core.depth","substrate","timepoint"))
 #reorder factor levels
 prex1_melt$variable <- factor(prex1_melt$variable,levels=c("notrt","CD","pH10","pH11"))
+prex1p <- data.frame("Inc"=prex1$Inc,"location"=prex1$location,"core.depth"=prex1$core.depth,"substrate"=prex1$substrate,"timepoint"=prex1$timepoint,"CD_p"=(((prex1$CD-prex1$notrt)/prex1$notrt)*100),"pH10_p"=(((prex1$pH10-prex1$notrt)/prex1$notrt)*100),"pH11_p"=(((prex1$pH11-prex1$notrt)/prex1$notrt)*100))
+prex1p_melt <- melt(prex1p,id.vars=c("Inc","location","core.depth","substrate","timepoint"))
 
 prex2 <- prex_intensities[grep("PreX2",prex_intensities$Inc),]
 prex2 <- prex2[,colSums(is.na(prex2))==0]
 prex2_melt <- melt(prex2,id.vars=c("Inc","location","core.depth","substrate","timepoint"))
 #reorder treatment factor order
 prex2_melt$variable <- factor(prex2_melt$variable,levels=c("notrt","X700","X1400","X2800"))
+prex2p <- data.frame("Inc"=prex2$Inc,"location"=prex2$location,"core.depth"=prex2$core.depth,"substrate"=prex2$substrate,"timepoint"=prex2$timepoint,"X700_p"=(((prex2$X700-prex2$notrt)/prex2$notrt)*100),"X1400_p"=(((prex2$X1400-prex2$notrt)/prex2$notrt)*100),"X2800_p"=(((prex2$X2800-prex2$notrt)/prex2$notrt)*100))
+prex2p_melt <- melt(prex2p,id.vars=c("Inc","location","core.depth","substrate","timepoint"))
 
 prex3 <- prex_intensities[grep("PreX3",prex_intensities$Inc),]
 prex3 <- prex3[,colSums(is.na(prex3))==0]
 prex3_melt <- melt(prex3,id.vars=c("Inc","location","core.depth","substrate","timepoint"))
+prex3p <- data.frame("Inc"=prex3$Inc,"location"=prex3$location,"core.depth"=prex3$core.depth,"substrate"=prex3$substrate,"timepoint"=prex3$timepoint,"nosds_p"=(((prex3$nosds-prex3$notrt)/prex3$notrt)*100),"sds_p"=(((prex3$sds-prex3$notrt)/prex3$notrt)*100))
+prex3p_melt <- melt(prex3p,id.vars=c("Inc","location","core.depth","substrate","timepoint"))
 
-theme_fig6 <- theme_bw() + theme(legend.position="none",axis.title=element_text(size=8,vjust=1),axis.text=element_text(size=5))
-#Fig 6a, prex1
-png("figures/Fig6a_PreX1Fluor.png",width=85,height=75,units="mm",res=900)
-ggplot(prex1_melt,aes(x=variable,y=value)) + geom_boxplot(width=0.8,size=0.3,outlier.size=1,aes(fill=variable)) + scale_fill_manual(values=prex1TrtColors) + scale_x_discrete(labels=c("no treatment","competitive desorption","pH10","pH11")) + theme_fig6 + labs(x="",y="Integrated Fluorescence (FUs)")
+theme_fig5 <- theme_bw() + theme(legend.position="none",axis.title=element_text(size=8,vjust=1),axis.text=element_text(size=5))
+#Fig 5a, prex1
+png("figures/Fig5a_PreX1Fluor.png",width=85,height=75,units="mm",res=900)
+p5a <- ggplot(prex1p_melt,aes(x=variable,y=value)) + geom_boxplot(width=0.8,size=0.3,outlier.size=1,aes(fill=variable)) + scale_fill_manual(values=prex1TrtColors) + scale_x_discrete(labels=c("competitive desorption","pH10","pH11")) + theme_fig5 + labs(x="",y="Improvement in Fluorescence Intensity (%)") 
+print(p5a)
 dev.off()
 
-#Fig 6b, prex2
-png("figures/Fig6b_PreX2Fluor.png",width=85,height=75,units="mm",res=900)
-ggplot(prex2_melt,aes(x=variable,y=value)) + geom_boxplot(width=0.8,size=0.3,outlier.size=1,aes(fill=variable)) + scale_fill_manual(values=prex2TrtColors) + scale_x_discrete(labels=c("no treatment","700uM","1400uM","2800uM")) + theme_fig6 + labs(x="",y="Integrated Fluorescence (FUs)") + coord_cartesian(ylim=c(400000,1100000))
+#Fig 5b, prex2
+png("figures/Fig5b_PreX2Fluor.png",width=85,height=75,units="mm",res=900)
+p5b <- ggplot(prex2p_melt,aes(x=variable,y=value)) + geom_boxplot(width=0.8,size=0.3,outlier.size=1,aes(fill=variable)) + scale_fill_manual(values=prex2TrtColors) + scale_x_discrete(labels=c("700uM","1400uM","2800uM")) + theme_fig5 + labs(x="",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,90))
+print(p5b)
 dev.off()
 
-#Fig 6c, prex3
-png("figures/Fig6c_PreX3Fluor.png",width=85,height=75,units="mm",res=900)
-ggplot(prex3_melt,aes(x=variable,y=value)) + geom_boxplot(width=0.8,size=0.3,outlier.size=1,aes(fill=variable)) + scale_fill_manual(values=prex3TrtColors) + scale_x_discrete(labels=c("no treatment","2800 -SDS","2800 +SDS")) + theme_fig6 + labs(x="",y="Integrated Fluorescence (FUs)")
+#Fig 5c, prex3
+png("figures/Fig5c_PreX3Fluor.png",width=85,height=75,units="mm",res=900)
+p5c <- ggplot(prex3p_melt,aes(x=variable,y=value)) + geom_boxplot(width=0.8,size=0.3,outlier.size=1,aes(fill=variable)) + scale_fill_manual(values=prex3TrtColors) + scale_x_discrete(labels=c("2800 -SDS","2800 +SDS")) + theme_fig5 + labs(x="",y="Improvement in Fluorescence Intensity (%)") + coord_cartesian(ylim=c(0,90))
+print(p5c)
 dev.off()
 
 prex1_test <- t.test((((prex1$CD-prex1$notrt)/prex1$notrt)*100),alternative="greater")
@@ -284,7 +303,29 @@ prex3_test <- t.test((((prex3$sds-prex3$notrt)/prex3$notrt)*100),alternative="gr
 print("median % increase in peak fluorescence units using SDS in PreX3:")
 print(paste(round(median(((prex3$sds-prex3$notrt)/prex3$notrt)*100),1),"; P=",round(prex3_test$p.value,3)))
 
- 
+
+###################### Figure 6 ########################
+#uses maxes
+#errorbar
+errorbars <- geom_errorbar(aes(ymin=mean.kcrate.nM.hr-sd.kcrate.nM.hr,ymax=mean.kcrate.nM.hr+sd.kcrate.nM.hr),width=0.4,color="grey25",alpha=0.7,size=0.3)
+theme_barplot <- theme_bw() + theme(axis.text.y=element_blank(),strip.background=element_rect(fill="grey93"))
+guaymas.trt <- maxes[maxes$location=="Guaymas" & maxes$treatment=="trt",]
+med.trt <- maxes[maxes$location=="Med" & maxes$treatment=="trt",]
+
+## Fig 6a - horizontal barplot Guaymas 
+png("figures/Fig6a_GuaymasMaxRatesBarplot.png",width=180,height=50,units="mm",res=900)
+p6a <- ggplot(guaymas.trt,aes(x=substrate,y=mean.kcrate.nM.hr)) + geom_bar(stat="identity",aes(fill=substrate)) + facet_grid(seddepth.cm~core) + errorbars + theme_barplot + scale_fill_manual(values=SubstrateColors) + coord_flip() + scale_y_continuous(breaks=c(0,100,200)) + labs(y="hydrolysis rate nM/hr",x="")
+print(p6a)
+dev.off()
+
+## Fig 6b - barplot Med
+png("figures/Fig6b_MedMaxRatesBarplot.png",width=85,height=150,units="mm",res=900)
+p6b <- ggplot(med.trt,aes(x=substrate,y=mean.kcrate.nM.hr)) + geom_bar(stat="identity",aes(fill=substrate)) + facet_grid(core.depth~.) + errorbars + theme_barplot + scale_fill_manual(values=SubstrateColors) + coord_flip() + scale_y_continuous(breaks=c(0,10,20,30)) + coord_flip(ylim=c(0,40)) + labs(y="hydrolysis rate nM/hr",x="")
+print(p6b)
+dev.off()
+
+
+
 ############## Discussion of any effect of the waterbath step on treatment rates ###############
 #rates of increase in LMW portions of chromatograms
 IncName <- sub("([Guaymas|Med|Marmara]+)-([A-Za-z0-9]+)-([0-9]+)cm-([a-z]+)-([0-9a-z]+)-t([0-9])","\\1-\\2-\\3cm-\\4-\\5",lmw_intensities_complete$Inc)

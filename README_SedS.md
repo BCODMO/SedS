@@ -23,6 +23,7 @@ RScript RawGPCProcess_SedS.R "stds-gpc2-110315/raw-asc" "stds-gpc2-110315/slant-
 RScript RawGPCProcess_SedS.R "stds-gpc3-052715/raw-asc" "stds-gpc3-052715/slant-corrected-csv" "stds-gpc3-052715/chroms-png"
 RScript RawGPCProcess_SedS.R "stds-gpc1-012413/raw-asc" "stds-gpc1-012413/slant-corrected-csv" "stds-gpc1-012413/chroms-png"
 RScript RawGPCProcess_SedS.R "stds-gpc2-020113/raw-asc" "stds-gpc2-020113/slant-corrected-csv" "stds-gpc2-020113/chroms-png"
+RScript RawGPCProcess_SedS.R "stds-gpc2-071913/raw-asc" "stds-gpc2-071913/slant-corrected-csv" "stds-gpc2-071913/chroms-png"
 
 ```
 
@@ -50,7 +51,7 @@ RScript CalculateStdBins_SedS.R "stds-gpc2-071913/slant-corrected-csv" "stdbins-
 4. Calculate hydrolysis rates:
 
 ```
-RScript FlaRates_SedS.R "SedComparison-csvs-for-rates" "FlaRates_SedS.csv"
+RScript FlaRates_SedS.R "CoreComparison-csvs-for-rates" "FlaRates_SedS.csv"
 ```
 
 
