@@ -14,7 +14,7 @@
 ##FlaProcess_SedS.R
 ##PreXFlaProcess_SedS.R
 ##FiguresAndAnalysis_SedS.R
-#data download
+#data downloaded from BCO-DMO
 
 ##Download raw GPC data:
 

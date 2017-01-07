@@ -52,9 +52,12 @@ prex3TrtColors <- c("#E34A33",colors[4])
 
 ############# Figure 2  ###############
 #example of treatment improvement on chromatogram quality; S4-chon, P13-55cm-lam, P1-55cm-lam
-S4_example <- intersect(list.files(path=csvDir,pattern=("S4-385cm")),list.files(path=csvDir,pattern=("chon")))
-P13_example <- intersect(list.files(path=csvDir,pattern=("P13-55cm")),list.files(path=csvDir,pattern=("lam")))
-P1_example <- intersect(list.files(path=csvDir,pattern=("P1-55cm")),list.files(path=csvDir,pattern=("lam")))
+S4 <- intersect(list.files(path=csvDir,pattern=("S4-385cm")),list.files(path=csvDir,pattern=("chon")))
+S4_example <- S4[c(1:4,17:20)]
+P13 <- intersect(list.files(path=csvDir,pattern=("P13-55cm")),list.files(path=csvDir,pattern=("lam")))
+P13_example <- P13[c(1:4,17:20)]
+P1 <- intersect(list.files(path=csvDir,pattern=("P1-55cm")),list.files(path=csvDir,pattern=("lam")))
+P1_example <- P1[c(1:4,17:20)]
 examples <- list("a-Med-S4-385cm-chon"=S4_example,"b-Guaymas-P13-55cm-lam"=P13_example,"c-Guaymas-P1-55cm-lam"=P1_example)
 #load in the slant corrected csvs for that example, compile into 32 dataframes with time, fluorescence, sample, and trt columns
 #rbind all 32 dataframes into 1
@@ -89,7 +92,7 @@ for (example in 1:length(examples)) {
     plot_title <- gsub("-","_",plot_title)
     figno <- substr(names(examples[example]),1,1)
     figs <- list()
-    header <- list(label,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot,blankPlot)
+    header <- list(label,blankPlot,blankPlot,blankPlot)
     for (treatment in levels(factor(df$treatment))) {
         treat <- df[df$treatment==treatment,]
         for (sample in levels(factor(treat$sample))) {
@@ -104,15 +107,15 @@ for (example in 1:length(examples)) {
             header[[plot_name]] <- plot
         }
     }
-    png(paste("figures/Fig2",figno,"_",plot_title,"ChromsComparison.png",sep=""),width=540,height=120,res=900,units="mm")
+    png(paste("figures/Fig2",figno,"_",plot_title,"ChromsComparison.png",sep=""),width=140,height=120,res=900,units="mm")
     #do.call(grid.arrange,c(header,ncol=16,nrow=3, left="mV",sub="time (min)"))
-    do.call(grid.arrange,c(header,ncol=16,nrow=3, left="mV",sub="time (min)"))
+    do.call(grid.arrange,c(header,ncol=4,nrow=3, left="mV",sub="time (min)"))
     dev.off()
 }
 rl = lapply(list("figures/Fig2a_Med_S4_385cm_chonChromsComparison.png","figures/Fig2b_Guaymas_P13_55cm_lamChromsComparison.png","figures/Fig2c_Guaymas_P1_55cm_lamChromsComparison.png"), readPNG)
 gl = lapply(rl, rasterGrob)
 png("figures/Fig2_chromcomparison.png",res=900,units="mm") #width=540,height=360,
-grid.arrange(gl) #grobs=
+grid.arrange(gl[[1]],gl[[2]],gl[[3]]) #grobs=
 dev.off()
 
 ###################### Figure 3 ########################
