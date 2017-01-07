@@ -53,12 +53,12 @@ for (example in 1:length(examples)) {
             header[[plot_name]] <- plot
         }
     }
-    png(paste("figures/Fig2",figno,"_",plot_title,"ChromsComparison.png",sep=""),width=540,height=120,res=900,units="mm")
+    png(paste("figures/SIFig1",figno,"_",plot_title,"ChromsComparison.png",sep=""),width=540,height=120,res=900,units="mm")
     #do.call(grid.arrange,c(header,ncol=16,nrow=3, left="mV",sub="time (min)"))
     do.call(grid.arrange,c(header,ncol=16,nrow=3, left="mV",sub="time (min)"))
     dev.off()
 }
-rl = lapply(list("figures/Fig2a_Med_S4_385cm_chonChromsComparison.png","figures/Fig2b_Guaymas_P13_55cm_lamChromsComparison.png","figures/Fig2c_Guaymas_P1_55cm_lamChromsComparison.png"), readPNG)
+rl = lapply(list("figures/SIFig1a_Med_S4_385cm_chonChromsComparison.png","figures/SIFig1b_Guaymas_P13_55cm_lamChromsComparison.png","figures/SIFig1c_Guaymas_P1_55cm_lamChromsComparison.png"), readPNG)
 gl = lapply(rl, rasterGrob)
 png("figures/Fig2_chromcomparison.png",res=900,units="mm") #width=540,height=360,
 grid.arrange(gl) #grobs=

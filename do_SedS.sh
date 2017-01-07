@@ -17,6 +17,10 @@
 #data downloaded from BCO-DMO
 
 ##Download raw GPC data:
+curl -O http://dmoserv3.whoi.edu/data/C-DEBI/Hoarfrost/GPC-activitydata-SedS.zip
+unzip GPC-activitydata-SedS.zip
+#copy all files to current directory
+cp -r GPC-activitydata-SedS/* .
 
 ##Slant correct data from raw GPC output for rates and standards
 
@@ -57,6 +61,5 @@ RScript PreXFlaProcess_SedS.R "PreXFlaRates_SedS.csv" "PreXFlaRatesFinal_SedS.cs
 
 ##Complete statistical analyses and generate figures in publication:
 RScript FiguresAndAnalysis_SedS.R
-
-
-##Process treatment development preliminary experiments
+##Generate supplemental info figs
+RScript SupplementalInfo_SedS.R

@@ -14,6 +14,7 @@ This is the ReadMe file corresponding to scripts used in the publication Hoarfro
 * **PreXFlaRates_SedS.R** - Calculates hydrolysis rates for PreX methods developement experiments. Accepts a directory from which to calculate hydrolysis rates and output file name as external arguments (also requires HydrolysisCutsInfo.csv and FlaTimepointsStdRefs_SedS.csv), and calculates hydrolysis rates for each timepoint within an incubation.
 * **PreXFlaProcess_SedS.R** - Accepts the name of the file input containing rates (output from PreXFlaRates_SedS.R) and output file name as external arguments, and adds factor columns, changes particular rate values to zero (using ChangeToZeroKeys.txt, after manual inspection of chromatogram quality), and extracts only the timepoint of maximum activity. Outputs max rates with factors as csv file.
 * **FiguresAndAnalysis_SedS.R** - Computes statistics and plots figures presented in the associated publication.
+* **SupplementalInfo_SedS.R** - creates SI Fig 1 from publication.
 
 ## This repository contains three reference files necessary for running scripts:
 
