@@ -32,3 +32,6 @@ git clone https://github.com/ahoarfrost/SedS.git
 cd SedS
 sh do_SedS.sh
 ```
+
+## These scripts are published with the following doi:
+https://zenodo.org/badge/DOI/10.5281/zenodo.233018.svg
