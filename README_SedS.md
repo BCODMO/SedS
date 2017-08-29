@@ -35,3 +35,6 @@ sh do_SedS.sh
 
 ## These scripts are published with the following doi:
 https://zenodo.org/badge/DOI/10.5281/zenodo.233018.svg
+
+## Data produced using these scripts can be found at the following BCO-DMO page:
+https://www.bco-dmo.org/dataset/668648
